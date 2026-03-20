@@ -29,7 +29,7 @@ namespace ApiCatalogo.Controllers
         }
 
         // GET: api/Categories/5
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:int:min(1)}")]
         public async Task<ActionResult<Category>> GetCategory(int id)
         {
             var category = await _context.Categories.AsNoTracking().FirstOrDefaultAsync(category => category.Id == id);
@@ -53,7 +53,7 @@ namespace ApiCatalogo.Controllers
 
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id:int}")]
+        [HttpPut("{id:int:min(1)}")]
         public async Task<IActionResult> PutCategory(int id, Category category)
         {
             if (id != category.Id)
@@ -94,7 +94,7 @@ namespace ApiCatalogo.Controllers
         }
 
         // DELETE: api/Categories/5
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:int:min(1)}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var category = await _context.Categories.FindAsync(id);
