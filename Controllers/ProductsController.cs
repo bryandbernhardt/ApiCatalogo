@@ -25,14 +25,14 @@ namespace ApiCatalogo.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            return await _context.Products.AsNoTracking().ToListAsync();
         }
 
         // GET: api/Products/5
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products.AsNoTracking().FirstOrDefaultAsync(product => product.Id == id);
 
             if (product == null)
             {

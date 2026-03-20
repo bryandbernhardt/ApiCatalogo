@@ -25,14 +25,14 @@ namespace ApiCatalogo.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
-            return await _context.Categories.ToListAsync();
+            return await _context.Categories.AsNoTracking().ToListAsync();
         }
 
         // GET: api/Categories/5
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Category>> GetCategory(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Categories.AsNoTracking().FirstOrDefaultAsync(category => category.Id == id);
 
             if (category == null)
             {
@@ -47,6 +47,7 @@ namespace ApiCatalogo.Controllers
         {
             return await _context.Categories
                 .Include(c => c.Products)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
