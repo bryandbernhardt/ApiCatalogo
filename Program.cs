@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using ApiCatalogo.Context;
+using ApiCatalogo.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -30,6 +31,7 @@ if (app.Environment.IsDevelopment())
     {
         options.WithOpenApiRoutePattern("/swagger/v1/swagger.json");
     });
+    app.ConfigureExceptionHandler();
 }
 
 app.UseHttpsRedirection();
