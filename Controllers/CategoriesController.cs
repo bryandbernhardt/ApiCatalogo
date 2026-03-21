@@ -16,10 +16,12 @@ namespace ApiCatalogo.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILogger _logger;
 
-        public CategoriesController(AppDbContext context)
+        public CategoriesController(AppDbContext context, ILogger<CategoriesController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: api/Categories
@@ -47,6 +49,7 @@ namespace ApiCatalogo.Controllers
         [HttpGet("products")]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategoriesProducts()
         {
+            _logger.LogInformation("========== GET api/categories/products ==========");
             return await _context.Categories
                 .Include(c => c.Products)
                 .AsNoTracking()

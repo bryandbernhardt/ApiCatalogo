@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using ApiCatalogo.Context;
 using ApiCatalogo.Extensions;
 using ApiCatalogo.Filters;
+using ApiCatalogo.Logging;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -23,6 +24,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     ServerVersion.AutoDetect(defaultConnection)));
 
 builder.Services.AddScoped<ApiLoggingFilter>();
+
+builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
+{
+    LogLevel = LogLevel.Information,
+}));
 
 var app = builder.Build();
 
