@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ApiCatalogo.Context;
 using ApiCatalogo.Filters;
 using ApiCatalogo.Models;
+using ApiCatalogo.Repositories;
 
 namespace ApiCatalogo.Controllers
 {
@@ -15,12 +16,12 @@ namespace ApiCatalogo.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICategoryRepository _repository;
         private readonly ILogger _logger;
 
-        public CategoriesController(AppDbContext context, ILogger<CategoriesController> logger)
+        public CategoriesController(ICategoryRepository repository, ILogger<CategoriesController> logger)
         {
-            _context = context;
+            _repository = repository;
             _logger = logger;
         }
 
@@ -29,31 +30,26 @@ namespace ApiCatalogo.Controllers
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
-            return await _context.Categories.AsNoTracking().ToListAsync();
+            var categories = await _repository.Get();
+            return Ok(categories);
         }
 
         // GET: api/Categories/5
         [HttpGet("{id:int:min(1)}")]
         public async Task<ActionResult<Category>> GetCategory(int id)
         {
-            var category = await _context.Categories.AsNoTracking().FirstOrDefaultAsync(category => category.Id == id);
-
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            return category;
+            var category = await _repository.GetById(id);
+            
+            if (category is not null) return Ok(category);
+            _logger.LogWarning("Category with id {Id} not found", id);
+            return NotFound($"Category with id {id} not found");
         }
 
         [HttpGet("products")]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategoriesProducts()
         {
-            _logger.LogInformation("========== GET api/categories/products ==========");
-            return await _context.Categories
-                .Include(c => c.Products)
-                .AsNoTracking()
-                .ToListAsync();
+            var categories = await _repository.GetWithProducts();
+            return Ok(categories);
         }
 
         // PUT: api/Categories/5
@@ -63,14 +59,11 @@ namespace ApiCatalogo.Controllers
         {
             if (id != category.Id)
             {
-                return BadRequest();
+                return BadRequest("Id mismatch");
             }
 
-            _context.Entry(category).State = EntityState.Modified;
-
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            var categoryUpdated = await _repository.Update(category);
+            return Ok(categoryUpdated);
         }
 
         // POST: api/Categories
@@ -78,9 +71,7 @@ namespace ApiCatalogo.Controllers
         [HttpPost]
         public async Task<ActionResult<Category>> PostCategory(Category category)
         {
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
-
+            await _repository.Create(category);
             return CreatedAtAction("GetCategory", new { id = category.Id }, category);
         }
 
@@ -88,21 +79,8 @@ namespace ApiCatalogo.Controllers
         [HttpDelete("{id:int:min(1)}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-
+            await _repository.Delete(id);
             return NoContent();
-        }
-
-        private bool CategoryExists(int id)
-        {
-            return _context.Categories.Any(e => e.Id == id);
         }
     }
 }
