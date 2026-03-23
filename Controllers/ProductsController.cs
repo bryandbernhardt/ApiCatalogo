@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ApiCatalogo.Context;
 using ApiCatalogo.Models;
+using ApiCatalogo.Repositories;
 
 namespace ApiCatalogo.Controllers
 {
@@ -14,32 +15,33 @@ namespace ApiCatalogo.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IProductRepository _repository;
 
-        public ProductsController(AppDbContext context)
+        public ProductsController(IProductRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         // GET: api/Products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            return await _context.Products.AsNoTracking().ToListAsync();
+            var products = await _repository.Get();
+            return Ok(products);
         }
 
         // GET: api/Products/5
         [HttpGet("{id:int:min(1)}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _context.Products.AsNoTracking().FirstOrDefaultAsync(product => product.Id == id);
+            var product = await _repository.GetById(id);
 
             if (product == null)
             {
                 return NotFound();
             }
 
-            return product;
+            return Ok(product);
         }
 
         // PUT: api/Products/5
@@ -49,14 +51,12 @@ namespace ApiCatalogo.Controllers
         {
             if (id != product.Id)
             {
-                return BadRequest();
+                return BadRequest("Id mismatch");
             }
 
-            _context.Entry(product).State = EntityState.Modified;
+            var productUpdated = await _repository.Update(product);
 
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok(productUpdated);
         }
 
         // POST: api/Products
@@ -64,9 +64,7 @@ namespace ApiCatalogo.Controllers
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(Product product)
         {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-
+            await _repository.Create(product);
             return CreatedAtAction("GetProduct", new { id = product.Id }, product);
         }
 
@@ -74,21 +72,8 @@ namespace ApiCatalogo.Controllers
         [HttpDelete("{id:int:min(1)}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-
+            await _repository.Delete(id);
             return NoContent();
-        }
-
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.Id == id);
         }
     }
 }
