@@ -1,11 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ApiCatalogo.Context;
 using ApiCatalogo.Filters;
 using ApiCatalogo.Models;
 using ApiCatalogo.Repositories;
@@ -16,49 +9,43 @@ namespace ApiCatalogo.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly ICategoryRepository _repository;
         private readonly ILogger _logger;
+        private readonly ICategoryRepository _repository;
 
-        public CategoriesController(ICategoryRepository repository, ILogger<CategoriesController> logger)
+        public CategoriesController(ILogger<CategoriesController> logger, ICategoryRepository repository)
         {
-            _repository = repository;
             _logger = logger;
+            _repository = repository;
         }
 
         // GET: api/Categories
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+        public async Task<ActionResult<IEnumerable<Category>>> GetAll()
         {
-            var categories = await _repository.Get();
+            var categories = await _repository.GetAll();
             return Ok(categories);
         }
 
         // GET: api/Categories/5
         [HttpGet("{id:int:min(1)}")]
-        public async Task<ActionResult<Category>> GetCategory(int id)
+        public async Task<ActionResult<Category>> GetById(int id)
         {
-            var category = await _repository.GetById(id);
+            var category = await _repository.GetById(c => c.Id == id);
             
             if (category is not null) return Ok(category);
             _logger.LogWarning("Category with id {Id} not found", id);
             return NotFound($"Category with id {id} not found");
         }
 
-        [HttpGet("products")]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategoriesProducts()
-        {
-            var categories = await _repository.GetWithProducts();
-            return Ok(categories);
-        }
-
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id:int:min(1)}")]
-        public async Task<IActionResult> PutCategory(int id, Category category)
+        public async Task<IActionResult> Update(int id, Category category)
         {
             if (id != category.Id)
             {
+                _logger.LogWarning("Id mismatch - id: {id}, categoryId: {categoryId}", id, category.Id);
                 return BadRequest("Id mismatch");
             }
 
@@ -69,17 +56,18 @@ namespace ApiCatalogo.Controllers
         // POST: api/Categories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory(Category category)
+        public async Task<ActionResult<Category>> Create(Category category)
         {
             await _repository.Create(category);
-            return CreatedAtAction("GetCategory", new { id = category.Id }, category);
+            return CreatedAtAction("GetById", new { id = category.Id }, category);
         }
 
         // DELETE: api/Categories/5
         [HttpDelete("{id:int:min(1)}")]
-        public async Task<IActionResult> DeleteCategory(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            await _repository.Delete(id);
+            var category = await _repository.GetById(c => c.Id == id);
+            if (category != null) await _repository.Delete(category);
             return NoContent();
         }
     }

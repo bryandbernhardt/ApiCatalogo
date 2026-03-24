@@ -349,3 +349,94 @@ WHERE `Id` = @p7;
 SELECT ROW_COUNT();
 Error: 0 - An unhandled error occurred: Status Code 500
 Information: 0 - Application is shutting down...
+Warning: DeveloperCertificatePartiallyTrusted - The ASP.NET Core developer certificate is only trusted by some clients. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+Information: ListeningOnAddress - Now listening on: https://localhost:7192
+Information: ListeningOnAddress - Now listening on: http://localhost:5113
+Information: 0 - Application started. Press Ctrl+C to shut down.
+Information: 0 - Hosting environment: Development
+Information: 0 - Content root path: /home/bryan/Dev/DotNet/ApiCatalogo
+Information: 0 - Application is shutting down...
+Warning: DeveloperCertificatePartiallyTrusted - The ASP.NET Core developer certificate is only trusted by some clients. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+Information: ListeningOnAddress - Now listening on: https://localhost:7192
+Information: ListeningOnAddress - Now listening on: http://localhost:5113
+Information: 0 - Application started. Press Ctrl+C to shut down.
+Information: 0 - Hosting environment: Development
+Information: 0 - Content root path: /home/bryan/Dev/DotNet/ApiCatalogo
+Error: 0 - An unhandled error occurred: Status Code 500
+Information: 0 - Application is shutting down...
+Warning: DeveloperCertificatePartiallyTrusted - The ASP.NET Core developer certificate is only trusted by some clients. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+Information: ListeningOnAddress - Now listening on: https://localhost:7192
+Information: ListeningOnAddress - Now listening on: http://localhost:5113
+Information: 0 - Application started. Press Ctrl+C to shut down.
+Information: 0 - Hosting environment: Development
+Information: 0 - Content root path: /home/bryan/Dev/DotNet/ApiCatalogo
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (28ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `p`.`Id`, `p`.`CategoryId`, `p`.`CreatedAt`, `p`.`Description`, `p`.`ImageUrl`, `p`.`Name`, `p`.`Price`, `p`.`Stock`
+FROM `Products` AS `p`
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (22ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = DateTime), @p2='?' (Size = 300), @p3='?' (Size = 300), @p4='?' (Size = 80), @p5='?' (DbType = Decimal), @p6='?' (DbType = Single)], CommandType='Text', CommandTimeout='30']
+INSERT INTO `Products` (`CategoryId`, `CreatedAt`, `Description`, `ImageUrl`, `Name`, `Price`, `Stock`)
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6);
+SELECT `Id`
+FROM `Products`
+WHERE ROW_COUNT() = 1 AND `Id` = LAST_INSERT_ID();
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `p`.`Id`, `p`.`CategoryId`, `p`.`CreatedAt`, `p`.`Description`, `p`.`ImageUrl`, `p`.`Name`, `p`.`Price`, `p`.`Stock`
+FROM `Products` AS `p`
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `p`.`Id`, `p`.`CategoryId`, `p`.`CreatedAt`, `p`.`Description`, `p`.`ImageUrl`, `p`.`Name`, `p`.`Price`, `p`.`Stock`
+FROM `Products` AS `p`
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (2ms) [Parameters=[@p7='?' (DbType = Int32), @p0='?' (DbType = Int32), @p1='?' (DbType = DateTime), @p2='?' (Size = 300), @p3='?' (Size = 300), @p4='?' (Size = 80), @p5='?' (DbType = Decimal), @p6='?' (DbType = Single)], CommandType='Text', CommandTimeout='30']
+SET AUTOCOMMIT = 1;
+UPDATE `Products` SET `CategoryId` = @p0, `CreatedAt` = @p1, `Description` = @p2, `ImageUrl` = @p3, `Name` = @p4, `Price` = @p5, `Stock` = @p6
+WHERE `Id` = @p7;
+SELECT ROW_COUNT();
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `p`.`Id`, `p`.`CategoryId`, `p`.`CreatedAt`, `p`.`Description`, `p`.`ImageUrl`, `p`.`Name`, `p`.`Price`, `p`.`Stock`
+FROM `Products` AS `p`
+Information: 0 - Application is shutting down...
+Warning: DeveloperCertificatePartiallyTrusted - The ASP.NET Core developer certificate is only trusted by some clients. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+Information: ListeningOnAddress - Now listening on: https://localhost:7192
+Information: ListeningOnAddress - Now listening on: http://localhost:5113
+Information: 0 - Application started. Press Ctrl+C to shut down.
+Information: 0 - Hosting environment: Development
+Information: 0 - Content root path: /home/bryan/Dev/DotNet/ApiCatalogo
+Error: 0 - An unhandled error occurred: Status Code 500
+Information: 0 - Application is shutting down...
+Warning: DeveloperCertificatePartiallyTrusted - The ASP.NET Core developer certificate is only trusted by some clients. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+Information: ListeningOnAddress - Now listening on: https://localhost:7192
+Information: ListeningOnAddress - Now listening on: http://localhost:5113
+Information: 0 - Application started. Press Ctrl+C to shut down.
+Information: 0 - Hosting environment: Development
+Information: 0 - Content root path: /home/bryan/Dev/DotNet/ApiCatalogo
+Error: 0 - An unhandled error occurred: Status Code 500
+Information: 0 - Application is shutting down...
+Warning: DeveloperCertificatePartiallyTrusted - The ASP.NET Core developer certificate is only trusted by some clients. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+Information: ListeningOnAddress - Now listening on: https://localhost:7192
+Information: ListeningOnAddress - Now listening on: http://localhost:5113
+Information: 0 - Application started. Press Ctrl+C to shut down.
+Information: 0 - Hosting environment: Development
+Information: 0 - Content root path: /home/bryan/Dev/DotNet/ApiCatalogo
+Information: 0 - OnActionExecuting
+Information: 0 - ##################################################
+Information: 0 - 3:45:18 PM
+Information: 0 - Model State: True
+Information: 0 - ##################################################
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (25ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `c`.`Id`, `c`.`ImageUrl`, `c`.`Name`
+FROM `Categories` AS `c`
+Information: 0 - OnActionExecuted
+Information: 0 - ##################################################
+Information: 0 - 3:45:19 PM
+Information: 0 - Status Code: 200
+Information: 0 - ##################################################
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (22ms) [Parameters=[@__id_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+SELECT `c`.`Id`, `c`.`ImageUrl`, `c`.`Name`
+FROM `Categories` AS `c`
+WHERE `c`.`Id` = @__id_0
+LIMIT 1
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `p`.`Id`, `p`.`CategoryId`, `p`.`CreatedAt`, `p`.`Description`, `p`.`ImageUrl`, `p`.`Name`, `p`.`Price`, `p`.`Stock`
+FROM `Products` AS `p`
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `p`.`Id`, `p`.`CategoryId`, `p`.`CreatedAt`, `p`.`Description`, `p`.`ImageUrl`, `p`.`Name`, `p`.`Price`, `p`.`Stock`
+FROM `Products` AS `p`

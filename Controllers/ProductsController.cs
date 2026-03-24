@@ -1,11 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ApiCatalogo.Context;
 using ApiCatalogo.Models;
 using ApiCatalogo.Repositories;
 
@@ -16,25 +9,25 @@ namespace ApiCatalogo.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductRepository _repository;
-
+        
         public ProductsController(IProductRepository repository)
         {
             _repository = repository;
         }
 
+
         // GET: api/Products
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        [HttpGet] public async Task<ActionResult<IEnumerable<Product>>> GetAll()
         {
-            var products = await _repository.Get();
+            var products = await _repository.GetAll();
             return Ok(products);
         }
 
         // GET: api/Products/5
         [HttpGet("{id:int:min(1)}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+        public async Task<ActionResult<Product>> GetById(int id)
         {
-            var product = await _repository.GetById(id);
+            var product = await _repository.GetById(p => p.Id == id);
 
             if (product == null)
             {
@@ -44,10 +37,17 @@ namespace ApiCatalogo.Controllers
             return Ok(product);
         }
 
+        [HttpGet("byCategory/{id:int:min(1)}")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetByCategory(int id)
+        {
+            var products = await _repository.GetByCategoryId(id);
+            return Ok(products);
+        }
+
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id:int:min(1)}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
+        public async Task<IActionResult> Update(int id, Product product)
         {
             if (id != product.Id)
             {
@@ -55,6 +55,11 @@ namespace ApiCatalogo.Controllers
             }
 
             var productUpdated = await _repository.Update(product);
+
+            if (productUpdated == null)
+            {
+                return NotFound();
+            }
 
             return Ok(productUpdated);
         }
@@ -65,14 +70,15 @@ namespace ApiCatalogo.Controllers
         public async Task<ActionResult<Product>> PostProduct(Product product)
         {
             await _repository.Create(product);
-            return CreatedAtAction("GetProduct", new { id = product.Id }, product);
+            return CreatedAtAction("GetById", new { id = product.Id }, product);
         }
 
         // DELETE: api/Products/5
         [HttpDelete("{id:int:min(1)}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            await _repository.Delete(id);
+            var product = await _repository.GetById(product => product.Id == id);
+            if (product != null) await _repository.Delete(product);
             return NoContent();
         }
     }
