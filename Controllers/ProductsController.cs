@@ -8,18 +8,18 @@ namespace ApiCatalogo.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly IProductRepository _repository;
+        private readonly IUnitOfWork _unitOfWork;
         
-        public ProductsController(IProductRepository repository)
+        public ProductsController(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
 
 
         // GET: api/Products
         [HttpGet] public async Task<ActionResult<IEnumerable<Product>>> GetAll()
         {
-            var products = await _repository.GetAll();
+            var products = await _unitOfWork.ProductRepository.GetAll();
             return Ok(products);
         }
 
@@ -27,7 +27,7 @@ namespace ApiCatalogo.Controllers
         [HttpGet("{id:int:min(1)}")]
         public async Task<ActionResult<Product>> GetById(int id)
         {
-            var product = await _repository.GetById(p => p.Id == id);
+            var product = await _unitOfWork.ProductRepository.GetById(p => p.Id == id);
 
             if (product == null)
             {
@@ -40,7 +40,7 @@ namespace ApiCatalogo.Controllers
         [HttpGet("byCategory/{id:int:min(1)}")]
         public async Task<ActionResult<IEnumerable<Product>>> GetByCategory(int id)
         {
-            var products = await _repository.GetByCategoryId(id);
+            var products = await _unitOfWork.ProductRepository.GetByCategoryId(id);
             return Ok(products);
         }
 
@@ -54,7 +54,8 @@ namespace ApiCatalogo.Controllers
                 return BadRequest("Id mismatch");
             }
 
-            var productUpdated = await _repository.Update(product);
+            var productUpdated = await _unitOfWork.ProductRepository.Update(product);
+            _unitOfWork.Commit();
 
             if (productUpdated == null)
             {
@@ -69,7 +70,9 @@ namespace ApiCatalogo.Controllers
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(Product product)
         {
-            await _repository.Create(product);
+            await _unitOfWork.ProductRepository.Create(product);
+            _unitOfWork.Commit();
+            
             return CreatedAtAction("GetById", new { id = product.Id }, product);
         }
 
@@ -77,8 +80,12 @@ namespace ApiCatalogo.Controllers
         [HttpDelete("{id:int:min(1)}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = await _repository.GetById(product => product.Id == id);
-            if (product != null) await _repository.Delete(product);
+            var product = await _unitOfWork.ProductRepository.GetById(product => product.Id == id);
+            if (product != null)
+            {
+                await _unitOfWork.ProductRepository.Delete(product);
+                _unitOfWork.Commit();
+            };
             return NoContent();
         }
     }

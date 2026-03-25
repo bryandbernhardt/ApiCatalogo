@@ -15,32 +15,29 @@ public class Repository<T> : IRepository<T> where T : class
 
     public async Task<IEnumerable<T>> GetAll()
     {
-        return await _context.Set<T>().ToListAsync();
+        return await _context.Set<T>().AsNoTracking().ToListAsync();
     }
 
     public async Task<T?> GetById(Expression<Func<T, bool>> predicate)
     {
-        return await _context.Set<T>().FirstOrDefaultAsync(predicate);
+        return await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(predicate);
     }
 
     public async Task<T> Create(T entity)
     {
         await _context.Set<T>().AddAsync(entity);
-        await _context.SaveChangesAsync();
         return entity;
     }
 
     public async Task<T?> Update(T entity)
     {
         _context.Set<T>().Update(entity);
-        await _context.SaveChangesAsync();
         return entity;
     }
 
     public async Task<T> Delete(T entity)
     {
         _context.Set<T>().Remove(entity);
-        await _context.SaveChangesAsync();
         return entity;
     }
 }

@@ -10,12 +10,12 @@ namespace ApiCatalogo.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly ILogger _logger;
-        private readonly ICategoryRepository _repository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CategoriesController(ILogger<CategoriesController> logger, ICategoryRepository repository)
+        public CategoriesController(ILogger<CategoriesController> logger, IUnitOfWork unitOfWork)
         {
             _logger = logger;
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Categories
@@ -23,7 +23,7 @@ namespace ApiCatalogo.Controllers
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public async Task<ActionResult<IEnumerable<Category>>> GetAll()
         {
-            var categories = await _repository.GetAll();
+            var categories = await _unitOfWork.CategoryRepository.GetAll();
             return Ok(categories);
         }
 
@@ -31,7 +31,7 @@ namespace ApiCatalogo.Controllers
         [HttpGet("{id:int:min(1)}")]
         public async Task<ActionResult<Category>> GetById(int id)
         {
-            var category = await _repository.GetById(c => c.Id == id);
+            var category = await _unitOfWork.CategoryRepository.GetById(c => c.Id == id);
             
             if (category is not null) return Ok(category);
             _logger.LogWarning("Category with id {Id} not found", id);
@@ -49,7 +49,9 @@ namespace ApiCatalogo.Controllers
                 return BadRequest("Id mismatch");
             }
 
-            var categoryUpdated = await _repository.Update(category);
+            var categoryUpdated = await _unitOfWork.CategoryRepository.Update(category);
+            _unitOfWork.Commit();
+            
             return Ok(categoryUpdated);
         }
 
@@ -58,7 +60,8 @@ namespace ApiCatalogo.Controllers
         [HttpPost]
         public async Task<ActionResult<Category>> Create(Category category)
         {
-            await _repository.Create(category);
+            await _unitOfWork.CategoryRepository.Create(category);
+            _unitOfWork.Commit();
             return CreatedAtAction("GetById", new { id = category.Id }, category);
         }
 
@@ -66,8 +69,12 @@ namespace ApiCatalogo.Controllers
         [HttpDelete("{id:int:min(1)}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var category = await _repository.GetById(c => c.Id == id);
-            if (category != null) await _repository.Delete(category);
+            var category = await _unitOfWork.CategoryRepository.GetById(c => c.Id == id);
+            if (category != null)
+            {
+                await _unitOfWork.CategoryRepository.Delete(category);
+                _unitOfWork.Commit();
+            }
             return NoContent();
         }
     }
