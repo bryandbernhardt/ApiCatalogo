@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ApiCatalogo.Models;
 using ApiCatalogo.Repositories;
 using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace ApiCatalogo.Controllers
 {
@@ -53,6 +54,37 @@ namespace ApiCatalogo.Controllers
             return Ok(productsDto);
         }
 
+        // POST: api/Products
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<ProductDTO>> PostProduct(ProductDTO productDto)
+        {
+            var product = _mapper.Map<Product>(productDto);
+            var newProduct = await _unitOfWork.ProductRepository.Create(product);
+            _unitOfWork.Commit();
+            
+            var newProductDto = _mapper.Map<ProductDTO>(newProduct);
+            return CreatedAtAction("GetById", new { id = newProductDto.Id }, newProductDto);
+        }
+
+        [HttpPatch("{id:int:min(1)}")]
+        public async Task<ActionResult<ProductUpdateResponseDTO>> Patch(int id,
+            JsonPatchDocument<ProductUpdateRequestDTO> patchProductDto)
+        {
+             var product = await _unitOfWork.ProductRepository.GetById(p => p.Id == id);
+            if (product is null) return NotFound();
+            
+            var productUpdateRequestDto = _mapper.Map<ProductUpdateRequestDTO>(product);
+            patchProductDto.ApplyTo(productUpdateRequestDto, ModelState);
+            if (!TryValidateModel(productUpdateRequestDto) || !ModelState.IsValid) return  BadRequest(ModelState);
+            
+            _mapper.Map(productUpdateRequestDto, product);
+            await _unitOfWork.ProductRepository.Update(product);
+            _unitOfWork.Commit();
+            
+            return Ok(_mapper.Map<ProductUpdateResponseDTO>(product));
+        }
+        
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id:int:min(1)}")]
@@ -74,19 +106,6 @@ namespace ApiCatalogo.Controllers
 
             var productUpdatedDto = _mapper.Map<ProductDTO>(productUpdated);
             return Ok(productUpdatedDto);
-        }
-
-        // POST: api/Products
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<ProductDTO>> PostProduct(ProductDTO productDto)
-        {
-            var product = _mapper.Map<Product>(productDto);
-            var newProduct = await _unitOfWork.ProductRepository.Create(product);
-            _unitOfWork.Commit();
-            
-            var newProductDto = _mapper.Map<ProductDTO>(newProduct);
-            return CreatedAtAction("GetById", new { id = newProductDto.Id }, newProductDto);
         }
 
         // DELETE: api/Products/5
