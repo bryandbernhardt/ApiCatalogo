@@ -1,6 +1,8 @@
+using ApiCatalogo.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using ApiCatalogo.Models;
 using ApiCatalogo.Repositories;
+using AutoMapper;
 
 namespace ApiCatalogo.Controllers
 {
@@ -9,23 +11,27 @@ namespace ApiCatalogo.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
         
-        public ProductsController(IUnitOfWork unitOfWork)
+        public ProductsController(IUnitOfWork unitOfWork,  IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
 
         // GET: api/Products
-        [HttpGet] public async Task<ActionResult<IEnumerable<Product>>> GetAll()
+        [HttpGet] public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAll()
         {
             var products = await _unitOfWork.ProductRepository.GetAll();
-            return Ok(products);
+            
+            var productsDto = _mapper.Map<IEnumerable<ProductDTO>>(products);
+            return Ok(productsDto);
         }
 
         // GET: api/Products/5
         [HttpGet("{id:int:min(1)}")]
-        public async Task<ActionResult<Product>> GetById(int id)
+        public async Task<ActionResult<ProductDTO>> GetById(int id)
         {
             var product = await _unitOfWork.ProductRepository.GetById(p => p.Id == id);
 
@@ -33,27 +39,31 @@ namespace ApiCatalogo.Controllers
             {
                 return NotFound();
             }
-
-            return Ok(product);
+            
+            var productDto = _mapper.Map<ProductDTO>(product);
+            return Ok(productDto);
         }
 
         [HttpGet("byCategory/{id:int:min(1)}")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetByCategory(int id)
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetByCategory(int id)
         {
             var products = await _unitOfWork.ProductRepository.GetByCategoryId(id);
-            return Ok(products);
+            var productsDto = _mapper.Map<IEnumerable<ProductDTO>>(products);
+            
+            return Ok(productsDto);
         }
 
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id:int:min(1)}")]
-        public async Task<IActionResult> Update(int id, Product product)
+        public async Task<ActionResult<ProductDTO>> Update(int id, ProductDTO productDto)
         {
-            if (id != product.Id)
+            if (id != productDto.Id)
             {
                 return BadRequest("Id mismatch");
             }
 
+            var product = _mapper.Map<Product>(productDto);
             var productUpdated = await _unitOfWork.ProductRepository.Update(product);
             _unitOfWork.Commit();
 
@@ -62,31 +72,35 @@ namespace ApiCatalogo.Controllers
                 return NotFound();
             }
 
-            return Ok(productUpdated);
+            var productUpdatedDto = _mapper.Map<ProductDTO>(productUpdated);
+            return Ok(productUpdatedDto);
         }
 
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        public async Task<ActionResult<ProductDTO>> PostProduct(ProductDTO productDto)
         {
-            await _unitOfWork.ProductRepository.Create(product);
+            var product = _mapper.Map<Product>(productDto);
+            var newProduct = await _unitOfWork.ProductRepository.Create(product);
             _unitOfWork.Commit();
             
-            return CreatedAtAction("GetById", new { id = product.Id }, product);
+            var newProductDto = _mapper.Map<ProductDTO>(newProduct);
+            return CreatedAtAction("GetById", new { id = newProductDto.Id }, newProductDto);
         }
 
         // DELETE: api/Products/5
         [HttpDelete("{id:int:min(1)}")]
-        public async Task<IActionResult> DeleteProduct(int id)
+        public async Task<ActionResult<ProductDTO>> DeleteProduct(int id)
         {
             var product = await _unitOfWork.ProductRepository.GetById(product => product.Id == id);
-            if (product != null)
-            {
-                await _unitOfWork.ProductRepository.Delete(product);
-                _unitOfWork.Commit();
-            };
-            return NoContent();
+            if (product is null) return NotFound();
+            
+            var deletedProduct = await _unitOfWork.ProductRepository.Delete(product);
+            _unitOfWork.Commit();
+            
+            var deletedProductDto = _mapper.Map<ProductDTO>(deletedProduct);
+            return Ok(deletedProductDto);
         }
     }
 }

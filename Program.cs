@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using ApiCatalogo.Context;
+using ApiCatalogo.DTOs.Mappings;
 using ApiCatalogo.Extensions;
 using ApiCatalogo.Filters;
 using ApiCatalogo.Logging;
@@ -37,6 +38,8 @@ builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderCon
 {
     LogLevel = LogLevel.Information,
 }));
+
+builder.Services.AddAutoMapper(cfg => { }, typeof(ProductDTOMappingProfile));   
 
 var app = builder.Build();
 
