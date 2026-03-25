@@ -1,3 +1,5 @@
+using ApiCatalogo.DTOs;
+using ApiCatalogo.DTOs.Mappings;
 using Microsoft.AspNetCore.Mvc;
 using ApiCatalogo.Filters;
 using ApiCatalogo.Models;
@@ -21,19 +23,26 @@ namespace ApiCatalogo.Controllers
         // GET: api/Categories
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public async Task<ActionResult<IEnumerable<Category>>> GetAll()
+        public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetAll()
         {
             var categories = await _unitOfWork.CategoryRepository.GetAll();
-            return Ok(categories);
+
+            var categoriesDto = categories.ToCategoryDtoList();
+
+            return Ok(categoriesDto);
         }
 
         // GET: api/Categories/5
         [HttpGet("{id:int:min(1)}")]
-        public async Task<ActionResult<Category>> GetById(int id)
+        public async Task<ActionResult<CategoryDTO>> GetById(int id)
         {
             var category = await _unitOfWork.CategoryRepository.GetById(c => c.Id == id);
             
-            if (category is not null) return Ok(category);
+            if (category is not null)
+            {
+                var categoryDto = category.ToCategoryDto();
+                return Ok(categoryDto);
+            }
             _logger.LogWarning("Category with id {Id} not found", id);
             return NotFound($"Category with id {id} not found");
         }
@@ -41,41 +50,52 @@ namespace ApiCatalogo.Controllers
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id:int:min(1)}")]
-        public async Task<IActionResult> Update(int id, Category category)
+        public async Task<ActionResult<CategoryDTO>> Update(int id, CategoryDTO categoryDto)
         {
-            if (id != category.Id)
+            if (id != categoryDto.Id)
             {
-                _logger.LogWarning("Id mismatch - id: {id}, categoryId: {categoryId}", id, category.Id);
+                _logger.LogWarning("Id mismatch - id: {id}, categoryId: {categoryId}", id, categoryDto.Id);
                 return BadRequest("Id mismatch");
             }
 
-            var categoryUpdated = await _unitOfWork.CategoryRepository.Update(category);
+            var category = categoryDto.ToCategory();
+
+            var updatedCategory = await _unitOfWork.CategoryRepository.Update(category);
             _unitOfWork.Commit();
             
-            return Ok(categoryUpdated);
+            var updatedCategoryDto = updatedCategory.ToCategoryDto();
+            
+            return Ok(updatedCategoryDto);
         }
 
         // POST: api/Categories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Category>> Create(Category category)
+        public async Task<ActionResult<CategoryDTO>> Create(CategoryDTO categoryDto)
         {
-            await _unitOfWork.CategoryRepository.Create(category);
+            var category = categoryDto.ToCategory();
+            
+            var newCategory = await _unitOfWork.CategoryRepository.Create(category);
             _unitOfWork.Commit();
-            return CreatedAtAction("GetById", new { id = category.Id }, category);
+
+            var newCategoryDto = newCategory.ToCategoryDto();
+            
+            return CreatedAtAction("GetById", new { id = newCategoryDto.Id }, newCategoryDto);
         }
 
         // DELETE: api/Categories/5
         [HttpDelete("{id:int:min(1)}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult<CategoryDTO>> Delete(int id)
         {
             var category = await _unitOfWork.CategoryRepository.GetById(c => c.Id == id);
-            if (category != null)
-            {
-                await _unitOfWork.CategoryRepository.Delete(category);
-                _unitOfWork.Commit();
-            }
-            return NoContent();
+            
+            if (category == null) return NotFound($"Category with id {id} not found");
+            
+            await _unitOfWork.CategoryRepository.Delete(category);
+            _unitOfWork.Commit();
+
+            var deletedCategoryDto = category.ToCategoryDto();
+            return  Ok(deletedCategoryDto);
         }
     }
 }
