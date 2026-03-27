@@ -1,9 +1,11 @@
 using ApiCatalogo.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using ApiCatalogo.Models;
+using ApiCatalogo.Pagination;
 using ApiCatalogo.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
+using Newtonsoft.Json;
 
 namespace ApiCatalogo.Controllers
 {
@@ -22,9 +24,20 @@ namespace ApiCatalogo.Controllers
 
 
         // GET: api/Products
-        [HttpGet] public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAll()
+        [HttpGet] public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAll([FromQuery] ProductsParameters productsParameters)
         {
-            var products = await _unitOfWork.ProductRepository.GetAll();
+            var products = await _unitOfWork.ProductRepository.GetAll(productsParameters);
+
+            var metadata = new
+            {
+                products.TotalCount,
+                products.PageSize,
+                products.CurrentPage,
+                products.TotalPages,
+                products.HasNext,
+                products.HasPrevious,
+            };
+            Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
             
             var productsDto = _mapper.Map<IEnumerable<ProductDTO>>(products);
             return Ok(productsDto);
