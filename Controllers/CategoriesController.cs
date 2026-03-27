@@ -28,7 +28,12 @@ namespace ApiCatalogo.Controllers
         public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetAll([FromQuery] CategoriesParameters categoriesParameters)
         {
             var categories = await _unitOfWork.CategoryRepository.GetAll(categoriesParameters);
-            
+
+            return GetCategoriesWithPaginationHeaders(categories);
+        }
+
+        private ActionResult<IEnumerable<CategoryDTO>> GetCategoriesWithPaginationHeaders(PagedList<Category> categories)
+        {
             var metadata = new
             {
                 categories.TotalCount,
@@ -58,6 +63,13 @@ namespace ApiCatalogo.Controllers
             }
             _logger.LogWarning("Category with id {Id} not found", id);
             return NotFound($"Category with id {id} not found");
+        }
+
+        [HttpGet("name")]
+        public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetFilteredByName([FromQuery] CategoriesFilterName categoriesFilterName)
+        {
+            var categories = await _unitOfWork.CategoryRepository.GetFilteredByName(categoriesFilterName);
+            return GetCategoriesWithPaginationHeaders(categories);
         }
 
         // PUT: api/Categories/5

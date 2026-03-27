@@ -1396,3 +1396,38 @@ Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Ex
 SELECT `p`.`Id`, `p`.`CategoryId`, `p`.`CreatedAt`, `p`.`Description`, `p`.`ImageUrl`, `p`.`Name`, `p`.`Price`, `p`.`Stock`
 FROM `Products` AS `p`
 Information: 0 - Application is shutting down...
+Warning: DeveloperCertificatePartiallyTrusted - The ASP.NET Core developer certificate is only trusted by some clients. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+Information: ListeningOnAddress - Now listening on: https://localhost:7192
+Information: ListeningOnAddress - Now listening on: http://localhost:5113
+Information: 0 - Application started. Press Ctrl+C to shut down.
+Information: 0 - Hosting environment: Development
+Information: 0 - Content root path: /home/bryan/Dev/DotNet/ApiCatalogo
+Information: 0 - OnActionExecuting
+Information: 0 - ##################################################
+Information: 0 - 1:44:32 AM
+Information: 0 - Model State: True
+Information: 0 - ##################################################
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (26ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `c`.`Id`, `c`.`ImageUrl`, `c`.`Name`
+FROM `Categories` AS `c`
+Information: 0 - OnActionExecuted
+Information: 0 - ##################################################
+Information: 0 - 1:44:33 AM
+Information: 0 - Status Code: 200
+Information: 0 - ##################################################
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `c`.`Id`, `c`.`ImageUrl`, `c`.`Name`
+FROM `Categories` AS `c`
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `c`.`Id`, `c`.`ImageUrl`, `c`.`Name`
+FROM `Categories` AS `c`
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `c`.`Id`, `c`.`ImageUrl`, `c`.`Name`
+FROM `Categories` AS `c`
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `c`.`Id`, `c`.`ImageUrl`, `c`.`Name`
+FROM `Categories` AS `c`
+Information: Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted - Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT `c`.`Id`, `c`.`ImageUrl`, `c`.`Name`
+FROM `Categories` AS `c`
+Information: 0 - Application is shutting down...

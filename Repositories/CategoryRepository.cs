@@ -15,4 +15,22 @@ public class CategoryRepository(AppDbContext context) : Repository<Category>(con
         
         return PagedList<Category>.ToPagedList(orderedCategories, categoriesParameters.PageNumber, categoriesParameters.PageSize);
     }
+
+    public async Task<PagedList<Category>> GetFilteredByName(CategoriesFilterName categoriesFilterName)
+    {
+        var categories = await GetAll();
+        var queryableCategories = categories.AsQueryable();
+
+        if (!string.IsNullOrEmpty(categoriesFilterName.Name))
+        {
+            queryableCategories = queryableCategories.Where(c => c.Name != null && c.Name.Contains(categoriesFilterName.Name, StringComparison.CurrentCultureIgnoreCase));
+        }
+        
+        var pagedCategories = PagedList<Category>.ToPagedList(
+            queryableCategories,
+            categoriesFilterName.PageNumber,
+            categoriesFilterName.PageSize);
+        
+        return pagedCategories;
+    }
 }
