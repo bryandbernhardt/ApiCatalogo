@@ -27,20 +27,7 @@ namespace ApiCatalogo.Controllers
         [HttpGet] public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAll([FromQuery] ProductsParameters productsParameters)
         {
             var products = await _unitOfWork.ProductRepository.GetAll(productsParameters);
-
-            var metadata = new
-            {
-                products.TotalCount,
-                products.PageSize,
-                products.CurrentPage,
-                products.TotalPages,
-                products.HasNext,
-                products.HasPrevious,
-            };
-            Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
-            
-            var productsDto = _mapper.Map<IEnumerable<ProductDTO>>(products);
-            return Ok(productsDto);
+            return GetProductsWithPaginationHeaders(products);
         }
 
         // GET: api/Products/5
@@ -64,6 +51,31 @@ namespace ApiCatalogo.Controllers
             var products = await _unitOfWork.ProductRepository.GetByCategoryId(id);
             var productsDto = _mapper.Map<IEnumerable<ProductDTO>>(products);
             
+            return Ok(productsDto);
+        }
+
+        [HttpGet("price")]
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetFilteredByPrice(
+            [FromQuery] ProductsFilterByPrice productsFilterByPrice)
+        {
+            var products = await _unitOfWork.ProductRepository.GetFilteredByPrice(productsFilterByPrice);
+            return GetProductsWithPaginationHeaders(products);
+        }
+
+        private ActionResult<IEnumerable<ProductDTO>> GetProductsWithPaginationHeaders(PagedList<Product> products)
+        {
+            var metadata = new
+            {
+                products.TotalCount,
+                products.PageSize,
+                products.CurrentPage,
+                products.TotalPages,
+                products.HasNext,
+                products.HasPrevious,
+            };
+            Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
+            
+            var productsDto = _mapper.Map<IEnumerable<ProductDTO>>(products);
             return Ok(productsDto);
         }
 
