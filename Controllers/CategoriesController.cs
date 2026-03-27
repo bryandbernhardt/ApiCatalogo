@@ -3,7 +3,9 @@ using ApiCatalogo.DTOs.Mappings;
 using Microsoft.AspNetCore.Mvc;
 using ApiCatalogo.Filters;
 using ApiCatalogo.Models;
+using ApiCatalogo.Pagination;
 using ApiCatalogo.Repositories;
+using Newtonsoft.Json;
 
 namespace ApiCatalogo.Controllers
 {
@@ -23,9 +25,20 @@ namespace ApiCatalogo.Controllers
         // GET: api/Categories
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetAll([FromQuery] CategoriesParameters categoriesParameters)
         {
-            var categories = await _unitOfWork.CategoryRepository.GetAll();
+            var categories = await _unitOfWork.CategoryRepository.GetAll(categoriesParameters);
+            
+            var metadata = new
+            {
+                categories.TotalCount,
+                categories.PageSize,
+                categories.CurrentPage,
+                categories.TotalPages,
+                categories.HasNext,
+                categories.HasPrevious,
+            };
+            Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
 
             var categoriesDto = categories.ToCategoryDtoList();
 
