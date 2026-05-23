@@ -26,7 +26,6 @@ public class ProductRepository(AppDbContext context) : Repository<Product>(conte
     public async Task<PagedList<Product>> GetFilteredByPrice(ProductsFilterByPrice productsFilterByPrice)
     {
         var products = await GetAll();
-        var queryableProducts = products.AsQueryable();
 
         if (productsFilterByPrice.Price.HasValue && !string.IsNullOrEmpty(productsFilterByPrice.CriterionPrice))
         {
@@ -39,10 +38,10 @@ public class ProductRepository(AppDbContext context) : Repository<Product>(conte
 
             if (filters.TryGetValue(productsFilterByPrice.CriterionPrice.ToLower(), out var filter))
             {
-                queryableProducts = queryableProducts.Where(filter).OrderBy(p => p.Price);
+                products = products.AsQueryable().Where(filter).OrderBy(p => p.Price);
             }
         }
 
-        return PagedList<Product>.ToPagedList(queryableProducts, productsFilterByPrice.PageNumber, productsFilterByPrice.PageSize);
+        return PagedList<Product>.ToPagedList(products.AsQueryable(), productsFilterByPrice.PageNumber, productsFilterByPrice.PageSize);
     }   
 }

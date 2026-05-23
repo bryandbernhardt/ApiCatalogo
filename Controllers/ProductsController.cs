@@ -86,7 +86,7 @@ namespace ApiCatalogo.Controllers
         {
             var product = _mapper.Map<Product>(productDto);
             var newProduct = await _unitOfWork.ProductRepository.Create(product);
-            _unitOfWork.Commit();
+            await _unitOfWork.Commit();
             
             var newProductDto = _mapper.Map<ProductDTO>(newProduct);
             return CreatedAtAction("GetById", new { id = newProductDto.Id }, newProductDto);
@@ -104,8 +104,8 @@ namespace ApiCatalogo.Controllers
             if (!TryValidateModel(productUpdateRequestDto) || !ModelState.IsValid) return  BadRequest(ModelState);
             
             _mapper.Map(productUpdateRequestDto, product);
-            await _unitOfWork.ProductRepository.Update(product);
-            _unitOfWork.Commit();
+            _unitOfWork.ProductRepository.Update(product);
+            await _unitOfWork.Commit();
             
             return Ok(_mapper.Map<ProductUpdateResponseDTO>(product));
         }
@@ -121,8 +121,8 @@ namespace ApiCatalogo.Controllers
             }
 
             var product = _mapper.Map<Product>(productDto);
-            var productUpdated = await _unitOfWork.ProductRepository.Update(product);
-            _unitOfWork.Commit();
+            var productUpdated = _unitOfWork.ProductRepository.Update(product);
+            await _unitOfWork.Commit();
 
             if (productUpdated == null)
             {
@@ -140,8 +140,8 @@ namespace ApiCatalogo.Controllers
             var product = await _unitOfWork.ProductRepository.GetById(product => product.Id == id);
             if (product is null) return NotFound();
             
-            var deletedProduct = await _unitOfWork.ProductRepository.Delete(product);
-            _unitOfWork.Commit();
+            var deletedProduct = _unitOfWork.ProductRepository.Delete(product);
+            await _unitOfWork.Commit();
             
             var deletedProductDto = _mapper.Map<ProductDTO>(deletedProduct);
             return Ok(deletedProductDto);

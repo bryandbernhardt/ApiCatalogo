@@ -85,8 +85,8 @@ namespace ApiCatalogo.Controllers
 
             var category = categoryDto.ToCategory();
 
-            var updatedCategory = await _unitOfWork.CategoryRepository.Update(category);
-            _unitOfWork.Commit();
+            var updatedCategory = _unitOfWork.CategoryRepository.Update(category);
+            await _unitOfWork.Commit();
             
             var updatedCategoryDto = updatedCategory.ToCategoryDto();
             
@@ -101,7 +101,7 @@ namespace ApiCatalogo.Controllers
             var category = categoryDto.ToCategory();
             
             var newCategory = await _unitOfWork.CategoryRepository.Create(category);
-            _unitOfWork.Commit();
+            await _unitOfWork.Commit();
 
             var newCategoryDto = newCategory.ToCategoryDto();
             
@@ -116,8 +116,8 @@ namespace ApiCatalogo.Controllers
             
             if (category == null) return NotFound($"Category with id {id} not found");
             
-            await _unitOfWork.CategoryRepository.Delete(category);
-            _unitOfWork.Commit();
+            _unitOfWork.CategoryRepository.Delete(category);
+            await _unitOfWork.Commit();
 
             var deletedCategoryDto = category.ToCategoryDto();
             return  Ok(deletedCategoryDto);
