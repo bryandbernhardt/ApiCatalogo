@@ -6,6 +6,7 @@ using ApiCatalogo.Models;
 using ApiCatalogo.Pagination;
 using ApiCatalogo.Repositories;
 using Newtonsoft.Json;
+using X.PagedList;
 
 namespace ApiCatalogo.Controllers
 {
@@ -32,18 +33,18 @@ namespace ApiCatalogo.Controllers
             return GetCategoriesWithPaginationHeaders(categories);
         }
 
-        private ActionResult<IEnumerable<CategoryDTO>> GetCategoriesWithPaginationHeaders(PagedList<Category> categories)
+        private ActionResult<IEnumerable<CategoryDTO>> GetCategoriesWithPaginationHeaders(IPagedList<Category> categories)
         {
             var metadata = new
             {
-                categories.TotalCount,
+                categories.Count,
                 categories.PageSize,
-                categories.CurrentPage,
-                categories.TotalPages,
-                categories.HasNext,
-                categories.HasPrevious,
+                categories.PageCount,
+                categories.TotalItemCount,
+                categories.HasNextPage,
+                categories.HasPreviousPage,
             };
-            Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
+            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
 
             var categoriesDto = categories.ToCategoryDtoList();
 

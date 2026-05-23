@@ -6,6 +6,7 @@ using ApiCatalogo.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Newtonsoft.Json;
+using X.PagedList;
 
 namespace ApiCatalogo.Controllers
 {
@@ -62,18 +63,18 @@ namespace ApiCatalogo.Controllers
             return GetProductsWithPaginationHeaders(products);
         }
 
-        private ActionResult<IEnumerable<ProductDTO>> GetProductsWithPaginationHeaders(PagedList<Product> products)
+        private ActionResult<IEnumerable<ProductDTO>> GetProductsWithPaginationHeaders(IPagedList<Product> products)
         {
             var metadata = new
             {
-                products.TotalCount,
+                products.Count,
                 products.PageSize,
-                products.CurrentPage,
-                products.TotalPages,
-                products.HasNext,
-                products.HasPrevious,
+                products.PageCount,
+                products.TotalItemCount,
+                products.HasNextPage,
+                products.HasPreviousPage,
             };
-            Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
+            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
             
             var productsDto = _mapper.Map<IEnumerable<ProductDTO>>(products);
             return Ok(productsDto);
